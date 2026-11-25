@@ -1,33 +1,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "readr.h"
 
-#define MAX_BUF_SIZE 80
-#define ARRAY_MULTIPLIER 3
-
-void cleanup(char **arr) {
+void cleanup(char **arr, int count) {
     printf("I'm in the cleanup method!\n");
 
     printf("Cleaning up individual strings\n");
-    for (int i=0;arr[i] != NULL; i++) {
+    for (int i=0;i < count; i++) {
         char *str = arr[i];
         printf("Cleaning up #%d: %s\n",i,str);
         free(arr[i]);
     }
-
+    
     printf("Cleaning up pointer array\n");
     free(arr);
 }
 
-void print_all_entries(char **arr) {
-    for (int i = 0; arr[i] != NULL; i++) {
+void print_all_entries(char **arr, int count) {
+    for (int i = 0; i < count; i++) {
         printf("The text at %d is: %s\n",i,arr[i]);
     }
 }
 
 int main(int argc, char *argv[]) {
-
-    printf("Arguments entered: %d\n",argc);
 
     // Initialize an array of pointers to character arrays with initial
     // size ARRAY MULTIPLIER and initial count 0.
@@ -39,17 +35,21 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+    // Loop for each argument provided
     for (size_t i = 1; i < argc; i++) {
 
         if (ct >= max) {
             printf("Resizing to %d; printing all current entries:\n",2*max);
-            print_all_entries(array);
+            print_all_entries(array,ct-1);
             char **temp = realloc(array, 2*max*sizeof(char *));
             if (temp == NULL) {
                 printf("Failed to reallocate memory for increased array size.");
-                cleanup(array);
+                cleanup(array, ct-1);
                 exit(1);
             }
+
+            // Success! Assign back to array.
+            array = temp;
             max = 2*max;
             printf("Array expanded - new max entries is: %d\n",max);
         }
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
         char *ptr = (char *)malloc(MAX_BUF_SIZE);
         if (ptr == NULL) {
             printf("Failed to allocate memory for individual buffer at sequence %d.\n",(int) i);
-            cleanup(array);
+            cleanup(array, ct);
             exit(1);
         }
 
@@ -70,22 +70,8 @@ int main(int argc, char *argv[]) {
     }
 
     printf("\n");
-    print_all_entries(array);
+    print_all_entries(array,ct);
 
-    /*
-    for (int i = 0; array[i] != NULL; i++) {
-        printf("The text at %d is: %s\n",i,array[i]);
-    }
-
-    for (int i=0;array[i] != NULL; i++) {
-        printf("Cleaning up string #%d\n",i);
-        free(array[i]);
-    }
-
-    printf("Cleaning up master array\n");
-    free(array);
-    */
-
-    cleanup(array);
+    cleanup(array, ct);
     return 0;
 }
