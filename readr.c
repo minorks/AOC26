@@ -3,8 +3,8 @@
 #include <string.h>
 #include "readr.h"
 
-void cleanup(char **arr, int* count) {
-    for (int i=0;i < *count; i++) {
+void cleanup(char **arr, int count) {
+    for (int i=0; i < count; i++) {
         char *str = arr[i];
         free(arr[i]);
     }
@@ -22,7 +22,7 @@ char** extendArray(char **arr,int *ct, int *max) {
     char **temp = realloc(arr, 2*(*max)*sizeof(char *));
     if (temp == NULL) {
         printf("Failed to reallocate memory for increased array size.");
-        cleanup(arr, ct-1);
+        cleanup(arr, (*ct)-1);
         exit(1);
     }
 
@@ -65,7 +65,7 @@ char** read(char *fName, int* ctPtr) {
         char *ptr = (char *)malloc(MAX_BUF_SIZE);
         if (ptr == NULL) {
             printf("Failed to allocate memory for individual buffer at sequence %d.\n",*ctPtr);
-            cleanup(array, ctPtr);
+            cleanup(array, *ctPtr);
             exit(1);
             return NULL;
         }
@@ -79,13 +79,24 @@ char** read(char *fName, int* ctPtr) {
     return array;
 }
 
-int main(int argc, char *argv[]) {
+int* initialize_read() {
     int ct = 0;
     int* ctPtr = &ct;
+    return ctPtr;
+}
+
+/*
+int main(int argc, char *argv[]) {
+    //int ct = 0;
+    //int* ctPtr = &ct;
+
+    int* ctPtr = initialize_read();
     char **myArray = read(argv[1], ctPtr);
-    printf("\nPrinting all entries:\n");
+    printf("\nPrinting all %d entries:\n",*ctPtr);
     print_all_entries(myArray,*ctPtr);
     printf("\n");
-    cleanup(myArray, ctPtr);
+    cleanup(myArray, *ctPtr);
+    printf("Finished!\n");
     return 0;
 }
+    */
