@@ -4,16 +4,17 @@
 #include "readr.h"
 
 void cleanup(readText* lst) {
-    for (int i=0; i < *lst->count; i++) {
+    for (int i=0; i < lst->count; i++) {
         char *str = lst->myArray[i];
         free(lst->myArray[i]);
     }
     free(lst);
 }
 
-void print_all_entries(readText *lst) {
-    for (int i = 0; i < *lst->count; i++) {
-        printf("The text at %d is: %s",i,lst->myArray[i]);
+void print_all_entries(const readText *lst) {
+    int ct = lst->count;
+    for (int i = 0; i < ct; i++) {
+        printf("The text at %d is: %s\n",i,lst->myArray[i]);
     }
 }
 
@@ -47,7 +48,7 @@ readText read(char *fName) {
         exit(1);
     }
     int ct = 0;
-    lst.count = &ct;
+    lst.count = ct;
 
     FILE *fp = fopen(fName, "r");
     if (fp == NULL) {
@@ -59,8 +60,8 @@ readText read(char *fName) {
     while (fgets(buff,sizeof(buff),fp) != NULL) {
 
         // Check to see if the array requires extension due to allocated size...
-        if (*lst.count >= max) {
-            printf("Count is: %d; max is: %d\n",*lst.count,*maxPtr);
+        if (lst.count >= max) {
+            printf("Count is: %d; max is: %d\n",lst.count,*maxPtr);
             lst = extendArray(&lst,maxPtr);
         }
 
@@ -68,7 +69,7 @@ readText read(char *fName) {
         // to receive the new string.
         char *ptr = (char *)malloc(MAX_BUF_SIZE);
         if (ptr == NULL) {
-            printf("Failed to allocate memory for individual buffer at sequence %d.\n",*lst.count);
+            printf("Failed to allocate memory for individual buffer at sequence %d.\n",lst.count);
             cleanup(&lst);
             exit(1);
         }
@@ -76,13 +77,14 @@ readText read(char *fName) {
         // Read input - strip trailing newline character
         buff[strcspn(buff, "\n")] = '\0';
         strcpy(ptr,buff);
-        lst.myArray[*lst.count] = ptr;
-        *lst.count += 1;
+        lst.myArray[lst.count] = ptr;
+        lst.count += 1;
     }
 
     return lst;
 }
 
+/*
 int main(int argc,char* argv[]) {
     readText myArray = read(argv[1]);
     printf("\nPrinting all %d entries:\n",*myArray.count);
@@ -92,6 +94,7 @@ int main(int argc,char* argv[]) {
     printf("Finished!\n");
     return 0;
 }
+    */
 
 /*
 int* initialize_read() {

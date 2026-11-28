@@ -11,7 +11,7 @@
  */
 typedef struct {
     char** myArray;
-    int* count;
+    int count;
 } readText;
 
 /**
@@ -22,7 +22,7 @@ typedef struct {
  */
 void cleanup(readText *lst);
 
-void print_all_entries(readText *lst);
+void print_all_entries(const readText *lst);
 readText extendArray(readText *arr, int *max);
 readText read(char *fName);
 //int* initialize_read();
